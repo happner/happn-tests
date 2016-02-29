@@ -1,0 +1,22 @@
+{
+  "name": "happn-tests",
+  "description": "test templates for happn",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/happner/happn-tests.git"
+  },
+  "dependencies": {
+    "async": "^1.5.2"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "coveralls": "^2.11.6",
+    "expect.js": "*",
+    "gulp": "^3.9.0",
+    "istanbul": "^0.4.1",
+    "mocha": "*",
+    "shortid": "^2.2.4"
+  },
+  "readmeFilename": "README.md"
+}
