@@ -1,5 +1,5 @@
 var fs = require('fs');
-var testFiles = fs.readdirSync(__dirname + '/subtests');
+var testFiles = fs.readdirSync(__dirname + '/contexts');
 
 var expect = require('expect.js');
 var async = require('async');
@@ -13,7 +13,7 @@ for (var testFileIndex in testFiles){
 
 	if (testFile.indexOf('test-01-vanilla') != 0) continue;//we only use files that start with 'test-'
 
-	var testInstance = require(__dirname + '/subtests/' + testFile);
+	var testInstance = require(__dirname + '/contexts/' + testFile);
 
 	var happn = testInstance.happnDependancy;
 	var service = happn.service;
