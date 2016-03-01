@@ -1,3 +1,7 @@
+[![npm](https://img.shields.io/npm/v/happn-tests.svg)](https://www.npmjs.com/package/happn-tests) [![Build Status](https://travis-ci.org/happner/happn-tests.svg?branch=master)](https://travis-ci.org/happner/happn-tests) [![Coverage Status](https://coveralls.io/repos/happner/happn-tests/badge.svg?branch=master&service=github)](https://coveralls.io/github/happner/happn-tests?branch=master) [![David](https://img.shields.io/david/happner/happn-tests.svg)]()
+
+<img src="https://raw.githubusercontent.com/happner/happner-website/master/images/HAPPN%20Logo%20B.png" width="300"></img>
+
 happn tests suite
 -----------------
 
@@ -104,7 +108,7 @@ node test/happn_test.js
 ```json
 
 {
-  "name": "happn-service-mongo",
+  "name": "happn-tests",
   "description": "service plugin for running happn on a mongo database",
   "version": "0.0.3",
   "main": "./lib/index",
@@ -115,7 +119,7 @@ node test/happn_test.js
 
 ```
 
-this was again borrowed from the [happn mongo service's](https://github.com/happner/happn-service-mongo) package.json.
+this was again borrowed from the [happn mongo service's](https://github.com/happner/happn-tests) package.json.
 
 
 
