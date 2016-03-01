@@ -8,13 +8,13 @@ module.exports = {
   publisherClient:function(happnInstance, callback){
 
     var config =  undefined;
-	   happn_client.create(config, callback);
+	  happn_client.create(config, callback);
 
   },
   listenerClient:function(happnInstance, callback){
 
   	var config =  undefined;
-	 happn_client.create(config, callback);
+	  happn_client.create(config, callback);
 
   }
 }
