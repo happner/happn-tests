@@ -3,7 +3,8 @@
   "description": "test templates for happn",
   "version": "0.0.5",
   "scripts":{
-    "test":"node test/happn_test"
+    "test":"node test/happn_test",
+    "test-cover": "istanbul cover _mocha -- silence.js test"
   },
   "repository": {
     "type": "git",
