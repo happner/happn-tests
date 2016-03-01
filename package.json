@@ -1,7 +1,10 @@
 {
   "name": "happn-tests",
   "description": "test templates for happn",
-  "version": "0.0.2",
+  "version": "0.0.3",
+  "scripts":{
+    "test":"node test/happn_test"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/happner/happn-tests.git"
@@ -28,7 +31,6 @@
   },
   "homepage": "https://github.com/happner/happn-tests#readme",
   "_id": "happn-tests@0.0.1",
-  "scripts": {},
   "_shasum": "06be6f6b05689845cbb32b1b37f3459be977889e",
   "_from": "happn-tests@*"
 }

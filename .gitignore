@@ -12,6 +12,8 @@ lib-cov
 *test/test-tmp*
 *.db
 
+templates/context/*
+
 pids
 logs
 results
