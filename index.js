@@ -11,8 +11,10 @@ function HappnTests(opts) {
 
 	if (!opts) opts = {};
 
-	if (!opts.contextDirectory)
-		opts.contextDirectory = '../../test/context';
+	if (!opts.contextDirectory){
+		var path = require('path');
+		opts.contextDirectory = path.resolve(__dirname, '../../test/context')
+	}
 
 	if (!opts.templateDirectory)
 		opts.templateDirectory = __dirname + '/templates';
@@ -21,51 +23,48 @@ function HappnTests(opts) {
 
 }
 
-HappnTests.prototype.run = function(){
+HappnTests.prototype.run = function(callback){
 
-	var Mocha = require('mocha');
-	var mocha = new Mocha();
-	var fs = require('fs-extra');
-	var path = require('path');
-	var _this = this;
+	try{
 
-	var testFiles = fs.readdirSync(_this.opts.templateDirectory);
-	var testContextFiles = fs.readdirSync(_this.opts.contextDirectory);
+		var Mocha = require('mocha');
+		var mocha = new Mocha();
+		var fs = require('fs-extra');
+		var path = require('path');
+		var _this = this;
 
-	console.log('ensuring:::' + __dirname + path.sep + 'templates' + path.sep + 'context');
+		var testFiles = fs.readdirSync(_this.opts.templateDirectory);
+		var testContextFiles = fs.readdirSync(_this.opts.contextDirectory);
+		fs.ensureDirSync(__dirname + path.sep + 'templates' + path.sep + 'context');
+		fs.emptyDirSync(__dirname + path.sep + 'templates' + path.sep + 'context')
 
-	fs.ensureDirSync(__dirname + path.sep + 'templates' + path.sep + 'context');
+		//move context to where they should be
+		for (var iFile in testContextFiles){
 
-	console.log('emptying:::' + __dirname + path.sep + 'templates' + path.sep + 'context');
+			var fileName = testContextFiles[iFile];
+			if (fs.lstatSync(_this.opts.contextDirectory + path.sep + fileName).isFile()){
+				fs.copySync(_this.opts.contextDirectory + path.sep + fileName, _this.opts.templateDirectory + path.sep + 'context' + path.sep + fileName);
+			}
 
-	fs.emptyDirSync(__dirname + path.sep + 'templates' + path.sep + 'context')
-
-	//move context to where they should be
-	for (var iFile in testContextFiles){
-
-		var fileName = testContextFiles[iFile];
-		if (fs.lstatSync(_this.opts.contextDirectory + path.sep + fileName).isFile()){
-			console.log('copying ' + _this.opts.contextDirectory + path.sep + fileName);
-			console.log('to ' + _this.opts.contextDirectory + path.sep + testContextFiles[iFile]);
-			fs.copySync(_this.opts.contextDirectory + path.sep + fileName, _this.opts.contextDirectory + path.sep + testContextFiles[iFile]);
 		}
 
-	}
-
-	//add the templates to the test
-	for (var iFile in testFiles){
-
-		var fileName = testFiles[iFile];
-		if (fs.lstatSync(_this.opts.templateDirectory + path.sep + fileName).isFile()){
-			mocha.addFile(_this.opts.templateDirectory + path.sep + testFiles[iFile]);
+		//add the templates to the test
+		for (var iFile in testFiles){
+			var fileName = testFiles[iFile];
+			if (fs.lstatSync(_this.opts.templateDirectory + path.sep + fileName).isFile()){
+				mocha.addFile(_this.opts.templateDirectory + path.sep + fileName);
+			}
 		}
-	}
 
-	mocha.run(function(e) {
-		if (e)
-			console.log(e);
-		else
-			console.log('happn tests ran ok');
-	});
+		mocha.run(function(failures){
+
+			if (failures) return callback(new Error('tests ran with failures:' + failures));
+
+			callback();
+		});
+
+	}catch(e){
+		callback(e);
+	}
 }
 

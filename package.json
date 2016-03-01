@@ -1,7 +1,7 @@
 {
   "name": "happn-tests",
   "description": "test templates for happn",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/happner/happn-tests.git"

@@ -1,5 +1,5 @@
 var fs = require('fs');
-var testFiles = fs.readdirSync(__dirname + '/contexts');
+var testFiles = fs.readdirSync(__dirname + '/context');
 
 var expect = require('expect.js');
 var async = require('async');
@@ -8,12 +8,13 @@ var test_secret = 'test_secret';
 var mode = "embedded";
 var default_timeout = 10000;
 
+
 for (var testFileIndex in testFiles){
 	var testFile = testFiles[testFileIndex];
 
-	if (testFile.indexOf('test-01-vanilla') != 0) continue;//we only use files that start with 'test-'
+	if (testFile.indexOf('01-vanilla') != 0) continue;//we only use files that start with 'test-'
 
-	var testInstance = require(__dirname + '/contexts/' + testFile);
+	var testInstance = require(__dirname + '/context/' + testFile);
 
 	var happn = testInstance.happnDependancy;
 	var service = happn.service;
@@ -49,7 +50,8 @@ for (var testFileIndex in testFiles){
 
 	        });
 	    } catch (e) {
-	      callback(e);
+	    	console.log('error init service:::', e);
+	      	callback(e);
 	    }
 	  });
 
