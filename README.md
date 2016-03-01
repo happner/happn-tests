@@ -2,8 +2,9 @@
 
 <img src="https://raw.githubusercontent.com/happner/happner-website/master/images/HAPPN%20Logo%20B.png" width="300"></img>
 
-happn tests suite
------------------
+happn tests
+-----------
+*we have a standard test that we inject a bunch of different contexts through, so if you happn to build a plugin for happn - you would use this test suite to ensure your code is up to standard.*
 
 getting started:
 ----------------
