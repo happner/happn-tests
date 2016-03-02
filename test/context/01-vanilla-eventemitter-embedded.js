@@ -8,19 +8,19 @@ module.exports = {
   publisherClient:function(happnInstance, callback){
 
     var config =  {
-		plugin: happn.client_plugins.intra_process,
-		context: happnInstance
-	}
+  		plugin: happn.client_plugins.intra_process,
+  		context: happnInstance
+  	}
 
-	happn_client.create(config, callback);
+  	happn_client.create(config, callback);
   },
   listenerClient:function(happnInstance, callback){
 
   	var config =  {
-		plugin: happn.client_plugins.intra_process,
-		context: happnInstance
-	}
+  		plugin: happn.client_plugins.intra_process,
+  		context: happnInstance
+  	}
 
-	happn_client.create(config, callback);
+  	happn_client.create(config, callback);
   }
 }
