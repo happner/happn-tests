@@ -25,8 +25,8 @@ for (var testFileIndex in testFiles){
 
 	describe(testFile.replace('.js',''), function () {
 
-		if (testInstance.description)
-		console.log('additional description:' + testInstance.description);
+	  if (testInstance.description)
+	  console.log('additional description:' + testInstance.description);
 	  	/*
 		   This test demonstrates starting up the happn service -
 		   the authentication service will use authTokenSecret to encrypt web tokens identifying
