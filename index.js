@@ -38,10 +38,36 @@ HappnTests.prototype.run = function(callback){
 		fs.ensureDirSync(__dirname + path.sep + 'templates' + path.sep + 'context');
 		fs.emptyDirSync(__dirname + path.sep + 'templates' + path.sep + 'context')
 
+		var onlyContext;
+		var onlyTemplate;
+
+		for (var iFile in testContextFiles){
+			var fileName = testContextFiles[iFile];
+			if (fs.lstatSync(_this.opts.contextDirectory + path.sep + fileName).isFile()){
+				if (fileName.indexOf('only.') == 0){
+					testContextFiles = [fileName];
+					break;
+				}
+			}
+		}
+
+		for (var iFile in testFiles){
+			var fileName = testFiles[iFile];
+			if (fs.lstatSync(_this.opts.templateDirectory + path.sep + fileName).isFile()){
+				if (fileName.indexOf('only.') == 0){
+					testFiles = [fileName];
+					break;
+				}
+			}
+		}
+
 		//move context to where they should be
 		for (var iFile in testContextFiles){
 
 			var fileName = testContextFiles[iFile];
+
+			if (fileName.indexOf('skip.') == 0) continue;
+
 			if (fs.lstatSync(_this.opts.contextDirectory + path.sep + fileName).isFile()){
 				fs.copySync(_this.opts.contextDirectory + path.sep + fileName, _this.opts.templateDirectory + path.sep + 'context' + path.sep + fileName);
 			}
@@ -51,6 +77,9 @@ HappnTests.prototype.run = function(callback){
 		//add the templates to the test
 		for (var iFile in testFiles){
 			var fileName = testFiles[iFile];
+
+			if (fileName.indexOf('skip.') == 0) continue;
+
 			if (fs.lstatSync(_this.opts.templateDirectory + path.sep + fileName).isFile()){
 				mocha.addFile(_this.opts.templateDirectory + path.sep + fileName);
 			}

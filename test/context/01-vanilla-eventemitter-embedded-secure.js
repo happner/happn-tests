@@ -15,7 +15,8 @@ module.exports = {
 		config:{
 			username:'_ADMIN',
 			password:'happn'
-		}
+		},
+		secure:true
 	}
 
 	happn_client.create(config, callback);
@@ -29,7 +30,8 @@ module.exports = {
 		config:{
 			username:'_ADMIN',
 			password:'happn'
-		}
+		},
+		secure:true
 	}
 
 	happn_client.create(config, callback);

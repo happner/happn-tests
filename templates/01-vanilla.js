@@ -1,59 +1,62 @@
 var fs = require('fs');
-var testFiles = fs.readdirSync(__dirname + '/context');
+var testFilenames = fs.readdirSync(__dirname + '/context');
 
 var expect = require('expect.js');
 var async = require('async');
-var testport = 8000;
-var test_secret = 'test_secret';
-var mode = "embedded";
 var default_timeout = 10000;
 
+var testFiles = [];
 
-for (var testFileIndex in testFiles){
-	var testFile = testFiles[testFileIndex];
+for (var testFileIndex in testFilenames){
 
-	if (testFile.indexOf('01-vanilla') != 0) continue;//we only use files that start with 'test-'
+	var testFilename = testFilenames[testFileIndex];
 
-	var testInstance = require(__dirname + '/context/' + testFile);
+	if (testFilename.indexOf('01-vanilla') != 0 && testFilename.indexOf('only.01-vanilla') != 0) continue;//we only use files that start with 'test-'
 
-	var happn = testInstance.happnDependancy;
-	var service = happn.service;
-	var happn_client = happn.client;
+	testFiles.push(testFilename);
 
-	var happnInstance = null;
 	var test_id;
 
-	describe(testFile.replace('.js',''), function () {
+	describe(testFilename.replace('.js',''), function () {
 
-	  if (testInstance.description)
-	  console.log('additional description:' + testInstance.description);
+		before(function () {
+
+			var testFile = testFiles.shift();
+
+			testInstance = require(__dirname + '/context/' + testFile);
+			happn = testInstance.happnDependancy;
+			service = happn.service;
+			happn_client = happn.client;
+			happnInstance = null;
+
+	    });
 	  	/*
 		   This test demonstrates starting up the happn service -
 		   the authentication service will use authTokenSecret to encrypt web tokens identifying
 		   the logon session. The utils setting will set the system to log non priority information
 	    */
 
-	  before('should initialize the service', function (callback) {
+		  before('should initialize the service', function (callback) {
 
-	    this.timeout(20000);
+		    this.timeout(20000);
 
-	    test_id = Date.now() + '_' + require('shortid').generate();
+		    test_id = Date.now() + '_' + require('shortid').generate();
 
-	    try {
-	      service.create(testInstance.serviceConfig,
-	        function (e, happnInst) {
-	          if (e)
-	            return callback(e);
+		    try {
+		      service.create(testInstance.serviceConfig,
+		        function (e, happnInst) {
+		          if (e)
+		            return callback(e);
 
-	          happnInstance = happnInst;
-	          callback();
+		          happnInstance = happnInst;
+		          callback();
 
-	        });
-	    } catch (e) {
-	    	console.log('error init service:::', e);
-	      	callback(e);
-	    }
-	  });
+		        });
+		    } catch (e) {
+		    	console.log('error init service:::', e);
+		      	callback(e);
+		    }
+		  });
 
 	  after(function(done) {
 	    happnInstance.stop(done);
@@ -165,9 +168,6 @@ for (var testFileIndex in testFiles){
 	          publisherclient.get('01-vanilla-test/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
 
 	            expect(results.property1 == 'property1').to.be(true);
-
-	            if (mode != 'embedded')
-	              expect(results.payload[0].created == results.payload[0].modified).to.be(true);
 
 	            callback(e);
 	          });
@@ -613,8 +613,6 @@ for (var testFileIndex in testFiles){
 	            ////////////////////////console.log(results);
 	            expect(results.property1 == 'property1').to.be(true);
 
-	            if (mode != 'embedded')
-	              expect(results.payload[0].created == results.payload[0].modified).to.be(true);
 
 	            callback(e);
 	          });
