@@ -6,9 +6,10 @@ var async = require('async');
 var testport = 8000;
 var test_secret = 'test_secret';
 var mode = "embedded";
-var default_timeout = 10000;
 
 var testFiles = [];
+
+var happn_tests_config = require('../test/config');
 
 for (var testFileIndex in testFilenames){
 
@@ -19,6 +20,8 @@ for (var testFileIndex in testFilenames){
 	testFiles.push(testFilename);
 
 	describe(testFilename.replace('.js',''), function() {
+
+		this.timeout(happn_tests_config.timeout);
 
 		before(function () {
 
@@ -37,8 +40,6 @@ for (var testFileIndex in testFilenames){
 		});
 
 		it('should initialize the service', function (callback) {
-
-		    this.timeout(20000);
 
 		    try {
 		      service.create(JSON.parse(JSON.stringify(testInstance.serviceConfig)),
@@ -63,7 +64,7 @@ for (var testFileIndex in testFilenames){
 		   database whilst another listens for changes.
 		   */
 		  it('should initialize the clients', function (callback) {
-		    this.timeout(default_timeout);
+
 
 		    try {
 
@@ -90,7 +91,7 @@ for (var testFileIndex in testFilenames){
 
 		  it('the listener should pick up a single wildcard event', function (callback) {
 
-		    this.timeout(default_timeout);
+
 
 		    try {
 		      //first listen for the change
@@ -128,7 +129,7 @@ for (var testFileIndex in testFilenames){
 
 		  it('the listener should pick up a single published event', function (callback) {
 
-		    this.timeout(default_timeout);
+
 
 		    try {
 
@@ -169,7 +170,7 @@ for (var testFileIndex in testFilenames){
 
 		  it('the listener should pick up a single published event', function (callback) {
 
-		    this.timeout(default_timeout);
+
 
 		    try {
 
@@ -207,7 +208,7 @@ for (var testFileIndex in testFilenames){
 
 		  it('the listener should pick up a single delete event', function (callback) {
 
-		    this.timeout(default_timeout);
+
 
 		    try {
 
@@ -342,8 +343,6 @@ for (var testFileIndex in testFilenames){
 		  it('should subscribe to the catch all notification', function (callback) {
 
 		    var caught = {};
-
-		    this.timeout(10000);
 		    var caughtCount = 0;
 
 		    listenerclient.onAll(function (eventData, meta) {
@@ -380,7 +379,7 @@ for (var testFileIndex in testFilenames){
 		  });
 
 		  it('should unsubscribe from all events', function (callback) {
-		    this.timeout(10000);
+
 
 		    var onHappened = false;
 

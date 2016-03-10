@@ -66,7 +66,7 @@ HappnTests.prototype.run = function(callback){
 
 			var fileName = testContextFiles[iFile];
 
-			if (fileName.indexOf('skip.') == 0) continue;
+			if (fileName.indexOf('skip.') == 0 || fileName.indexOf('.') == 0) continue;
 
 			if (fs.lstatSync(_this.opts.contextDirectory + path.sep + fileName).isFile()){
 				fs.copySync(_this.opts.contextDirectory + path.sep + fileName, _this.opts.templateDirectory + path.sep + 'context' + path.sep + fileName);
@@ -78,7 +78,7 @@ HappnTests.prototype.run = function(callback){
 		for (var iFile in testFiles){
 			var fileName = testFiles[iFile];
 
-			if (fileName.indexOf('skip.') == 0) continue;
+			if (fileName.indexOf('skip.') == 0 || fileName.indexOf('.') == 0) continue;
 
 			if (fs.lstatSync(_this.opts.templateDirectory + path.sep + fileName).isFile()){
 				mocha.addFile(_this.opts.templateDirectory + path.sep + fileName);

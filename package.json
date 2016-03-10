@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "async": "^1.5.2",
+    "byline": "^4.2.1",
     "fs-extra": "^0.26.5",
     "happn": "^2.5.10",
     "request": "^2.69.0"
@@ -25,6 +26,8 @@
     "mocha": "*",
     "shortid": "^2.2.4"
   },
+  "author": "",
+  "license": "MIT",
   "readmeFilename": "README.md",
   "readme": "ERROR: No README data found!",
   "gitHead": "73ab37925a9ef3ba8a9323b85152628dfb80993f",

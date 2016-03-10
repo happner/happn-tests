@@ -3,9 +3,9 @@ var testFilenames = fs.readdirSync(__dirname + '/context');
 
 var expect = require('expect.js');
 var async = require('async');
-var default_timeout = 10000;
 
 var testFiles = [];
+var happn_tests_config = require('../test/config');
 
 for (var testFileIndex in testFilenames){
 
@@ -18,6 +18,8 @@ for (var testFileIndex in testFilenames){
 	var test_id;
 
 	describe(testFilename.replace('.js',''), function () {
+
+		this.timeout(happn_tests_config.timeout);
 
 		before(function () {
 
@@ -37,8 +39,6 @@ for (var testFileIndex in testFilenames){
 	    */
 
 		  before('should initialize the service', function (callback) {
-
-		    this.timeout(20000);
 
 		    test_id = Date.now() + '_' + require('shortid').generate();
 
@@ -71,7 +71,6 @@ for (var testFileIndex in testFilenames){
 	   database whilst another listens for changes.
 	   */
 	  before('should initialize the clients', function (callback) {
-	    this.timeout(default_timeout);
 
 	    try {
 
@@ -100,7 +99,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the listener should pick up a single wildcard event', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 
@@ -136,7 +135,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the publisher should get null for unfound data, exact path', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    var test_path_end = require('shortid').generate();
 	    publisherclient.get('01-vanilla-test/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
@@ -153,7 +152,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the publisher should set new data', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 	      var test_path_end = require('shortid').generate();
@@ -183,7 +182,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
-	    this.timeout(default_timeout);
+
 	    var timesCount = 10;
 
 	    var testBasePath = '/01-vanilla-test/' + test_id + '/set_multiple'
@@ -247,7 +246,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 
@@ -413,7 +412,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('should delete some test data', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 
@@ -446,7 +445,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the publisher should set new data then update the data', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 	      var test_path_end = require('shortid').generate();
@@ -554,7 +553,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the listener should pick up a single published event', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 
@@ -596,7 +595,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the publisher should set new data ', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 	      var test_path_end = require('shortid').generate();
@@ -629,7 +628,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the publisher should set new data then update the data', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 	      var test_path_end = require('shortid').generate();
@@ -667,7 +666,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the publisher should push a sibling and get all siblings', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 
@@ -706,7 +705,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the listener should pick up a single published event', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    try {
 
@@ -803,7 +802,7 @@ for (var testFileIndex in testFilenames){
 
 	  it('the listener should pick up a single delete event', function (callback) {
 
-	    this.timeout(default_timeout);
+
 
 	    //We put the data we want to delete into the database
 	    publisherclient.set('/01-vanilla-test/' + test_id + '/testsubscribe/data/delete_me', {
@@ -939,8 +938,6 @@ for (var testFileIndex in testFilenames){
 	  it('should subscribe to the catch all notification', function (callback) {
 
 	    var caught = {};
-
-	    this.timeout(10000);
 	    var caughtCount = 0;
 
 	    listenerclient.onAll(function (eventData, meta) {
@@ -974,7 +971,6 @@ for (var testFileIndex in testFilenames){
 	  });
 
 	  it('should unsubscribe from all events', function (callback) {
-	    this.timeout(10000);
 
 	    var onHappened = false;
 

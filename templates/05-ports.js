@@ -6,9 +6,10 @@ var async = require('async');
 var testport = 8000;
 var test_secret = 'test_secret';
 var mode = "embedded";
-var default_timeout = 10000;
 
 var testFiles = [];
+
+var happn_tests_config = require('../test/config');
 
 for (var testFileIndex in testFilenames){
 
@@ -19,6 +20,8 @@ for (var testFileIndex in testFilenames){
 	testFiles.push(testFilename);
 
 	describe(testFilename.replace('.js',''), function() {
+
+		this.timeout(happn_tests_config.timeout);
 
 		var service1Port = 8000;
 		var service2Port = 8001;
@@ -72,8 +75,6 @@ for (var testFileIndex in testFilenames){
 
 		it('should initialize the services', function(callback) {
 
-			this.timeout(20000);
-
 			try{
 
 				initializeService(testInstance.server1Config, function(e){
@@ -92,7 +93,7 @@ for (var testFileIndex in testFilenames){
 		});
 
 		it('should initialize the clients', function(callback) {
-			this.timeout(default_timeout);
+
 
 			try{
 			  //plugin, config, context,

@@ -6,9 +6,10 @@ var async = require('async');
 var testport = 8000;
 var test_secret = 'test_secret';
 var mode = "embedded";
-var default_timeout = 10000;
 
 var testFiles = [];
+var happn_tests_config = require('../test/config');
+
 
 for (var testFileIndex in testFilenames){
 
@@ -21,6 +22,8 @@ for (var testFileIndex in testFilenames){
 	describe(testFilename.replace('.js',''), function() {
 
 		var request = require('request');
+
+		this.timeout(happn_tests_config.timeout);
 
 		before(function () {
 
@@ -42,7 +45,7 @@ for (var testFileIndex in testFilenames){
 
 		it('should initialize the service', function(callback) {
 
-			this.timeout(20000);
+
 
 			try{
 				service.create(testInstance.serviceConfig,
@@ -64,7 +67,7 @@ for (var testFileIndex in testFilenames){
 
 		it('should fetch the browser client', function(callback) {
 
-			this.timeout(5000);
+
 
 			try{
 

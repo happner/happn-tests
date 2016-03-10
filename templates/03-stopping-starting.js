@@ -6,9 +6,10 @@ var async = require('async');
 var testport = 8000;
 var test_secret = 'test_secret';
 var mode = "embedded";
-var default_timeout = 10000;
 
 var testFiles = [];
+
+var happn_tests_config = require('../test/config');
 
 for (var testFileIndex in testFilenames){
 
@@ -19,6 +20,8 @@ for (var testFileIndex in testFilenames){
 	testFiles.push(testFilename);
 
 	describe(testFilename.replace('.js',''), function() {
+
+		this.timeout(happn_tests_config.timeout);
 
 		before(function () {
 
@@ -84,14 +87,11 @@ for (var testFileIndex in testFilenames){
 
 		    before('should initialize the service', function(callback) {
 
-		      this.timeout(20000);
 		      initService(tmpFile, '5_eventemitter_stoppingstarting', callback);
 
 		    });
 
 		    after('should delete the temp data file', function(callback) {
-
-		      this.timeout(20000);
 
 		      stopService(function(e){
 		        fs.unlink(tmpFile, function(e){
@@ -104,7 +104,6 @@ for (var testFileIndex in testFilenames){
 
 		    it('should push some data into a permanent datastore', function(callback) {
 
-		      this.timeout(default_timeout);
 
 		      getClient(currentService, function(e, testclient){
 
@@ -122,7 +121,6 @@ for (var testFileIndex in testFilenames){
 
 		   it('should disconnect then reconnect and reverify the data', function(callback) {
 
-		    this.timeout(default_timeout);
 		    initService(tmpFile, '5_eventemitter_stoppingstarting', function(e){
 
 		      if (e) return callback(e);
@@ -144,8 +142,6 @@ for (var testFileIndex in testFilenames){
 		   });
 
 		   it('should create a memory server - check for the data - shouldnt be any', function(callback) {
-
-		    this.timeout(default_timeout);
 
 		    initService(null, '5_eventemitter_stoppingstarting', function(e){
 
@@ -170,7 +166,6 @@ for (var testFileIndex in testFilenames){
 
 		   it('should stop then start and verify the server name', function(callback) {
 
-		    this.timeout(default_timeout);
 		    initService(tmpFile, '5_eventemitter_stoppingstarting', function(e){
 
 		      if (e) return callback(e);

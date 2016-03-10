@@ -6,7 +6,8 @@ var async = require('async');
 var testport = 8000;
 var test_secret = 'test_secret';
 var mode = "embedded";
-var default_timeout = 10000;
+
+var happn_tests_config = require('../test/config');
 
 var testFiles = [];
 
@@ -19,6 +20,8 @@ for (var testFileIndex in testFilenames){
 	testFiles.push(testFilename);
 
 	describe(testFilename.replace('.js',''), function() {
+
+		this.timeout(happn_tests_config.timeout);
 
 		before(function () {
 
@@ -37,8 +40,6 @@ for (var testFileIndex in testFilenames){
 	  	});
 
 	  	before('should initialize the service', function (callback) {
-
-		    this.timeout(20000);
 
 		    try {
 		      service.create(testInstance.serviceConfig,
@@ -63,7 +64,7 @@ for (var testFileIndex in testFilenames){
 	    database whilst another listens for changes.
 	    */
 		before('should initialize the clients', function (callback) {
-		    this.timeout(default_timeout);
+
 
 		    try {
 
@@ -100,7 +101,7 @@ for (var testFileIndex in testFilenames){
 
 		it('tests the set meta data', function (callback) {
 
-		    this.timeout(default_timeout);
+
 
 		    try {
 		      //first listen for the change
@@ -268,7 +269,7 @@ for (var testFileIndex in testFilenames){
 
 			  it('searches by timestamps', function (callback) {
 
-			    this.timeout(5000);
+
 
 			    var itemIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -370,7 +371,7 @@ for (var testFileIndex in testFilenames){
 
 			it('tests the all meta data', function (callback) {
 
-			    this.timeout(default_timeout);
+
 
 			    try {
 			      //first listen for the change
