@@ -1,10 +1,8 @@
-var async = require('async');
-
 function Test(){
 
 }
 
-Test.prototype.initialize = function(testName, testFunction, callback){
+Test.prototype.initialize = function(testName, testFunction){
   var fs = require('fs');
 
   var contextNames = fs.readdirSync(__dirname + '/templates/context');
@@ -20,10 +18,11 @@ Test.prototype.initialize = function(testName, testFunction, callback){
       testFiles.push(templateName);
   });
 
-  async.eachSeries(testFiles, function(testFilename, testFilenameCB){
+  testFiles.map(function(testFilename){
+
     testFilename = testFilename.replace('.js','').replace('only.','');
 
-    async.eachSeries(contextNames, function(contextName, contextNameCB){
+    contextNames.map(function(contextName){
 
       if (contextName.indexOf(testFilename) == 0){
 
@@ -33,12 +32,8 @@ Test.prototype.initialize = function(testName, testFunction, callback){
 
         var Context = require(__dirname + '/templates/context/' + contextName);
 
-        if (!Context.init)
-          Context.init = function(cb){
-            cb();
-          };
-
         Context.name = contextName;
+
         Context.config = happn_tests_config;
 
         Context.happn = Context.happnDependancy;
@@ -49,19 +44,14 @@ Test.prototype.initialize = function(testName, testFunction, callback){
 
         Context.helper = new TestHelper(testName);
 
-        Context.init(function(e){
+        Contexts[testName] = Context;
+        console.log('pushed context:::', testName);
+        describe(testName, testFunction);
 
-          if (e) return contextNameCB(e);
-          //add to the contexts
-          Contexts[testName] = Context;
-          describe(testName, testFunction);
-          contextNameCB();
-
-        });
       }
-    }, testFilenameCB);
-
-  }, callback);
+    });
+  });
 }
+
 
 module.exports = Test;

@@ -25,4 +25,6 @@ test.initialize('a2-encryption', function(){
     callback();
   });
 
-}.bind(this));
+}.bind(this), function(e){
+  console.log('TEST WAS INIT:::');
+});
