@@ -1,8 +1,10 @@
+var async = require('async');
+
 function Test(){
 
 }
 
-Test.prototype.initialize = function(testName, testFunction){
+Test.prototype.initialize = function(testName, testFunction, callback){
   var fs = require('fs');
 
   var contextNames = fs.readdirSync(__dirname + '/templates/context');
@@ -18,34 +20,48 @@ Test.prototype.initialize = function(testName, testFunction){
       testFiles.push(templateName);
   });
 
-  for (var fileNameIndex in testFiles) {
+  async.eachSeries(testFiles, function(testFilename, testFilenameCB){
+    testFilename = testFilename.replace('.js','').replace('only.','');
 
-    var testFilename = testFiles[fileNameIndex].replace('.js','').replace('only.','');
-
-    contextNames.map(function(contextName){
-
-      console.log('checking context against test file:::', contextName, testFilename);
+    async.eachSeries(contextNames, function(contextName, contextNameCB){
 
       if (contextName.indexOf(testFilename) == 0){
 
-        console.log('describe in:::',describe);
+        var testName = contextName.replace('.js','').replace('only.','');
 
         testContexts.push(contextName);
 
-        testFunction.__config = happn_tests_config;
-        testFunction.__context = require(__dirname + '/templates/context/' + contextName);
+        var Context = require(__dirname + '/templates/context/' + contextName);
 
-        testFunction.__happn = testFunction.__context.happnDependancy;
-        testFunction.__service = testFunction.__happn.service;
-        testFunction.__happn_client = testFunction.__happn.client;
+        if (!Context.init)
+          Context.init = function(cb){
+            cb();
+          };
 
-        testFunction.__expect = require('expect.js');
+        Context.name = contextName;
+        Context.config = happn_tests_config;
 
-        describe(testFilename.replace('.js', ''), testFunction);
+        Context.happn = Context.happnDependancy;
+        Context.service = Context.happn.service;
+        Context.happn_client = Context.happn.client;
 
+        var TestHelper = require('./test_helper');
+
+        Context.helper = new TestHelper(testName);
+
+        Context.init(function(e){
+
+          if (e) return contextNameCB(e);
+          //add to the contexts
+          Contexts[testName] = Context;
+          describe(testName, testFunction);
+          contextNameCB();
+
+        });
       }
-    });
-  }
+    }, testFilenameCB);
+
+  }, callback);
 }
 
 module.exports = Test;

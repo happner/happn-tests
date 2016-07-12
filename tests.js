@@ -1,4 +1,5 @@
 Test = require('./test');
+GLOBAL.Contexts = [];
 
 module.exports = HappnTests;
 module.exports.instantiate = function(opts){
@@ -75,9 +76,7 @@ HappnTests.prototype.run = function(callback){
 
 			if (fs.lstatSync(_this.opts.contextPath + path.sep + fileName).isFile()){
 				fs.copySync(_this.opts.contextPath + path.sep + fileName, _this.opts.templatePath + path.sep + 'context' + path.sep + fileName);
-				console.log('copied over context:::', _this.opts.templatePath + path.sep + 'context' + path.sep + fileName);
 			}
-
 		}
 
 		//add the templates to the test
@@ -85,22 +84,40 @@ HappnTests.prototype.run = function(callback){
 		for (var iFile in testFiles){
 			var fileName = testFiles[iFile];
 
-			if (fileName.indexOf('skip.') == 0 || fileName.indexOf('.') == 0) continue;
+			if (fileName.indexOf('skip.') == 0 || fileName.indexOf('.') == 0 || fileName == 'hooks.js') continue;
 
 			if (fs.lstatSync(_this.opts.templatePath + path.sep + fileName).isFile()){
 				mocha.addFile(_this.opts.templatePath + path.sep + fileName);
-				console.log('added test file:::', _this.opts.templatePath + path.sep + fileName);
 				testsToRun.push(_this.opts.templatePath + path.sep + fileName);
 			}
 		}
 
 		console.log('running tests:::', testsToRun.join(','));
-		mocha.run(function(failures){
 
-			if (failures) return callback(new Error('tests ran with failures:' + failures));
+		mocha.run()
 
-			callback();
-		});
+			.on('suite', function(suite) {
+				suite.Context = Contexts[suite.title];
+			})
+			.on('hook', function(test) {
+				test.Context =  Contexts[test.parent.title];
+			})
+			.on('test', function(test) {
+				test.Context =  Contexts[test.parent.title];
+			})
+			.on('test end', function(test) {
+				test.Context =  Contexts[test.parent.title];
+			})
+			.on('pass', function(test) {
+				console.log('Test pass: '+test.title);
+			})
+			.on('fail', function(test, err) {
+				console.log('Test fail: '+test.title);
+			})
+			.on('end', function(failures) {
+				if (failures) return callback(new Error('tests ran with failures:' + failures));
+				callback();
+			});
 
 	}catch(e){
 		callback(e);
