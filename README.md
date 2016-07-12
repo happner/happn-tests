@@ -23,7 +23,7 @@ happn_test.js:
 //this is specific to the project you are testing - this code is borrowed from the mongo plugin for happn
 TEST_GLOBALS = {};
 
-var service = require('../index.js');
+var service = require('../tests.js');
 var serviceInstance = new service();
 
 var config = {

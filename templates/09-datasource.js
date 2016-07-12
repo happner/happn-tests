@@ -3,9 +3,7 @@ var testFilenames = fs.readdirSync(__dirname + '/context');
 
 var expect = require('expect.js');
 var async = require('async');
-var testport = 8000;
 var test_secret = 'test_secret';
-var mode = "embedded";
 var happn_tests_config = require('../test/config');
 
 var testFiles = [];
