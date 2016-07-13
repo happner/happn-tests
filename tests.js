@@ -1,5 +1,8 @@
-Test = require('./test');
+var benchMarket = require('benchmarket');
+GLOBAL.Test = require('./test');
 GLOBAL.Contexts = [];
+
+var config = require('./config');
 
 module.exports = HappnTests;
 module.exports.instantiate = function(opts){
@@ -92,27 +95,43 @@ HappnTests.prototype.run = function(callback){
 			}
 		}
 
-		console.log('running tests:::', testsToRun.join(','));
-
 		mocha.run()
 
 			.on('suite', function(suite) {
 				suite.Context = Contexts[suite.title];
+				require('benchmarket').start();
 			})
 			.on('hook', function(test) {
 				test.Context =  Contexts[test.parent.title];
+				if (test.title.indexOf('"after all"') == 0){
+					require('benchmarket').storeCall(test.parent, config, function(e){
+						console.log('did store for test: ' + test.parent.title);
+					});
+				}
 			})
 			.on('test', function(test) {
 				test.Context =  Contexts[test.parent.title];
+				test.file = test.parent.file;
+				if (config.timeout)
+					test.timeout(config.timeout);
+				benchMarket.beforeCall(test);
 			})
 			.on('test end', function(test) {
 				test.Context =  Contexts[test.parent.title];
 			})
+			.on('suite end', function(suite) {
+				suite.Context = Contexts[suite.title];
+				require('benchmarket').stop();
+			})
 			.on('pass', function(test) {
 				console.log('Test pass: '+test.title);
+				test.file = test.parent.file;
+				benchMarket.afterCall(null, test);
 			})
 			.on('fail', function(test, err) {
 				console.log('Test fail: '+test.title);
+				test.file = test.parent.file;
+				benchMarket.afterCall(err, test);
 			})
 			.on('end', function(failures) {
 				if (failures) return callback(new Error('tests ran with failures:' + failures));
