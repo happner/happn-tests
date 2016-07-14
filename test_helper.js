@@ -1,12 +1,15 @@
-var shortid = require('shortid');
-var path = require('path');
-var fs = require('fs');
-var async = require('async');
-var happn = require('happn');
+var shortid = require('shortid')
+  , path = require('path')
+  , fs = require('fs')
+  , async = require('async')
+  , happn = require('happn')
+  , happn_client = happn.client
+;
 
 function TestHelper(testName){
   this.testName = testName;
   this.happnServices = [];
+  this.happnClients = [];
 }
 
 var tempDirectory = false;
@@ -23,7 +26,7 @@ TestHelper.prototype.testId = function(){
   return testId;
 };
 
-TestHelper.randomFile = function(ext){
+TestHelper.prototype.randomFile = function(ext){
   if (ext)
     return this.ensureTestDirectory() + path.sep + this.shortid + '.' + ext;
   else this.ensureTestDirectory() + path.sep + this.shortid;
@@ -68,7 +71,26 @@ TestHelper.prototype.startHappnServices = function(configs, opts, callback){
         }
 
         if (opts && opts.websocketsClient){
-          //TODO - add websocket client config
+          clientConfig = {
+            config:{
+              port:55000
+            }
+          };
+
+          if (config.port)
+            clientConfig.config.port = config.port;
+        }
+
+        if (config.secure){
+
+          clientConfig.secure = true;
+          clientConfig.config = {
+            username:'_ADMIN',
+            password:'happn'
+          }
+
+          if (config.services && config.services.security && config.services.security.adminPassword)
+            clientConfig.config.password = config.services.security.adminPassword;
         }
 
         happn_client.create(clientConfig, function(e, clientInstance){
@@ -89,7 +111,11 @@ TestHelper.prototype.startHappnServices = function(configs, opts, callback){
       _this.addHappnService(service);
     });
 
-    callback(services, clients);
+    clients.map(function(client){
+      _this.addHappnClient(client);
+    });
+
+    callback(null, services, clients);
   });
 
 }
@@ -98,18 +124,45 @@ TestHelper.prototype.addHappnService = function(service){
   this.happnServices.push(service);
 };
 
-TestHelper.prototype.tearDown = function(callback){
-  this.deleteTestDirectory();
+TestHelper.prototype.addHappnClient = function(client){
+  this.happnClients.push(client);
+};
 
-  if (this.happnServices.length > 0){
+TestHelper.prototype.stopHappnServices = function(callback){
 
-    async.each(this.happnServices,
+  if (this.happnServices.length == 0) return callback();
+
+  async.each(this.happnServices,
     function(currentService, eachServiceCB){
       currentService.stop(eachServiceCB);
     },
     callback);
+}
 
-  } else callback();
+TestHelper.prototype.disconnectHappnClients = function(callback){
+
+  if (this.happnClients.length == 0) return callback();
+
+  console.log('disconnecting clients:::', this.happnClients.length);
+
+  async.each(this.happnClients,
+    function(currentClient, eachClientCB){
+      currentClient.disconnect(eachClientCB);
+    },
+    callback);
+}
+
+TestHelper.prototype.tearDown = function(callback){
+
+  var _this = this;
+
+  _this.deleteTestDirectory();
+
+  _this.disconnectHappnClients(function(e){
+    if (e) console.error('unable to disconnect all clients: ' + e.toString(), e);
+    _this.stopHappnServices(callback);
+  });
+
 }
 
 module.exports = TestHelper;

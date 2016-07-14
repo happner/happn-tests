@@ -12,7 +12,7 @@ test.initialize('a2-encryption', function(){
 
   it('should do a long test method 1', function (callback) {
     console.log('A2 LONG METHODE:::', this.test.Context.name);
-    setTimeout(callback, 8100);
+    setTimeout(callback, 6000);
   });
 
   before('should initialize the services', function(callback) {

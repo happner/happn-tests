@@ -45,10 +45,7 @@ HappnTests.prototype.run = function(callback){
 		var testContextFiles = fs.readdirSync(_this.opts.contextPath);
 
 		fs.ensureDirSync(__dirname + path.sep + 'templates' + path.sep + 'context');
-		fs.emptyDirSync(__dirname + path.sep + 'templates' + path.sep + 'context')
-
-		var onlyContext;
-		var onlyTemplate;
+		fs.emptyDirSync(__dirname + path.sep + 'templates' + path.sep + 'context');
 
 		for (var iFile in testContextFiles){
 			var fileName = testContextFiles[iFile];
@@ -105,7 +102,7 @@ HappnTests.prototype.run = function(callback){
 				test.Context =  Contexts[test.parent.title];
 				if (test.title.indexOf('"after all"') == 0){
 					require('benchmarket').storeCall(test.parent, config, function(e){
-						console.log('did store for test: ' + test.parent.title);
+						console.log('benchmarket stored: ' + test.parent.title);
 					});
 				}
 			})
@@ -124,12 +121,10 @@ HappnTests.prototype.run = function(callback){
 				require('benchmarket').stop();
 			})
 			.on('pass', function(test) {
-				console.log('Test pass: '+test.title);
 				test.file = test.parent.file;
 				benchMarket.afterCall(null, test);
 			})
 			.on('fail', function(test, err) {
-				console.log('Test fail: '+test.title);
 				test.file = test.parent.file;
 				benchMarket.afterCall(err, test);
 			})
