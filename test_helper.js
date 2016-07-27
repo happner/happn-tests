@@ -1,6 +1,6 @@
 var shortid = require('shortid')
   , path = require('path')
-  , fs = require('fs')
+  , fs = require('fs-extra')
   , async = require('async')
   , happn = require('happn')
   , happn_client = happn.client
@@ -21,28 +21,31 @@ TestHelper.prototype.shortid = function(){
 
 TestHelper.prototype.testId = function(){
   if (!testId){
-    testId = Date.now() + '_' + shortid.generate();
+    testId = Date.now() + '_' + this.shortid();
   }
   return testId;
 };
 
 TestHelper.prototype.randomFile = function(ext){
   if (ext)
-    return this.ensureTestDirectory() + path.sep + this.shortid + '.' + ext;
-  else this.ensureTestDirectory() + path.sep + this.shortid;
+    return this.ensureTestDirectory() + path.sep + this.shortid() + '.' + ext;
+  else this.ensureTestDirectory() + path.sep + this.shortid();
 }
 
 TestHelper.prototype.ensureTestDirectory = function(){
   if (!tempDirectory){
-    fs.mkdirSync(__dirname + path.sep + 'temp' + path.sep + testId);
-    tempDirectory = __dirname + path.sep + 'temp' + path.sep + testId;
+    fs.mkdirSync(__dirname + path.sep + 'temp' + path.sep + this.testId());
+    tempDirectory = __dirname + path.sep + 'temp' + path.sep + this.testId();
   }
   return tempDirectory;
 };
 
 TestHelper.prototype.deleteTestDirectory = function(){
-  if (tempDirectory)
+  if (tempDirectory){
+    fs.emptyDirSync(tempDirectory);
     fs.rmdirSync(tempDirectory);
+    console.log('deleted temp dir:::', tempDirectory);
+  }
 };
 
 TestHelper.prototype.startHappnServices = function(configs, opts, callback){

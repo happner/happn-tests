@@ -101,7 +101,7 @@ module.exports = {
 you save your context file as 01-vanilla-[my context name].js in the context folder. you are now A for away and can test, using node like so:
 
 ```bash
-node test/happn_test.js
+node run
 ```
 
 *NB: if you are already running mocha tests, it is fine to locate your happn_test file elsewhere - so you dont get instances where the tests are automatically run causing issues, you can also update your package.json to run mocha tests and then the happn_test file, as follows: *

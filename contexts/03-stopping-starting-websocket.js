@@ -7,8 +7,7 @@ module.exports = {
   serviceConfig:{
     services: {
       data: {
-        path: './services/data_embedded/service.js',
-        config: {}
+        path: './services/data_embedded/service.js'
       }
     }
   },

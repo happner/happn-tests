@@ -1,5 +1,4 @@
 var happn = require('happn')
-var happn_client = happn.client;
 
 module.exports = {
   happnDependancy:require('happn'),
@@ -7,8 +6,7 @@ module.exports = {
   serviceConfig:{
     services: {
       data: {
-        path: './services/data_embedded/service.js',
-        config: {}
+        path: './services/data_embedded/service.js'
       }
     }
   },

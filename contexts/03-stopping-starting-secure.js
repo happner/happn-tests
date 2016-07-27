@@ -5,13 +5,12 @@ module.exports = {
   happnDependancy:require('happn'),
   description:"default server configuration",
   serviceConfig:{
-    secure:true,
     services: {
       data: {
-        path: './services/data_embedded/service.js',
-        config: {}
+        path: './services/data_embedded/service.js'
       }
-    }
+    },
+    secure:true
   },
   getClientConfig:function(service){
   	return {

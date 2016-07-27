@@ -1,6 +1,10 @@
-var benchMarket = require('benchmarket');
+GLOBAL.benchMarket = require('benchmarket');
+
 GLOBAL.Test = require('./test');
 GLOBAL.Contexts = [];
+
+GLOBAL.expect = require('expect.js');
+GLOBAL.async = require('async');
 
 var config = require('./config');
 

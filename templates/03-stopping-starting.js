@@ -2,8 +2,6 @@ var test = new Test();
 
 test.initialize('03-stopping-starting', function() {
 
-	var expect = require('expect.js');
-
 	var tmpFile;
 	var persistKey;
 	var currentService;
@@ -24,6 +22,15 @@ test.initialize('03-stopping-starting', function() {
 
 			var serviceConfig = JSON.parse(JSON.stringify(testContext.serviceConfig));
 
+			if (!serviceConfig.services)
+				serviceConfig.services = {};
+
+			if (!serviceConfig.services.data)
+				serviceConfig.services.data = {};
+
+			if (!serviceConfig.services.data.config)
+				serviceConfig.services.data.config = {};
+
 			serviceConfig.services.data.config.filename = filename;
 			serviceConfig.name = name;
 
@@ -31,6 +38,10 @@ test.initialize('03-stopping-starting', function() {
 				function(e, happnService){
 					if (e) return callback(e);
 					currentService = happnService;
+
+					//so it can be torn down
+					testContext.helper.addHappnService(currentService);
+
 					callback();
 				}
 			);
@@ -51,27 +62,30 @@ test.initialize('03-stopping-starting', function() {
 
 	before('should initialize the service', function(callback) {
 
+
 		tmpFile = this.test.Context.helper.randomFile('nedb');
+
+		console.log('have random file:::', tmpFile);
+
 		persistKey = '/persistence_test/' +  this.test.Context.helper.shortid();
 		currentService = null;
+
 		happn = this.test.Context.happnDependancy;
+
+		console.log('about to initService:::', tmpFile);
 
 		initService(tmpFile, '3_stopping_starting', this.test.Context, callback);
 
 	});
 
-	after('should delete the temp data file', function(callback) {
-
-		stopService(function(){
-			require('fs').unlink(tmpFile, function(){
-				callback();
-			});
-		});
+	after(function(done) {
+		this.test.Context.helper.tearDown(done);
 	});
 
-	it('should push some data into a permanent datastore', function(callback) {
+	it('should push some data into a permanent datastore', function (callback) {
 
-		getClient(currentService, this.test.Context, function(e, testclient){
+
+		getClient(currentService, this.test.Context, function (e, testclient) {
 
 			if (e) return callback(e);
 
@@ -85,19 +99,19 @@ test.initialize('03-stopping-starting', function() {
 
 	});
 
-	it('should disconnect then reconnect and reverify the data', function(callback) {
+	it('should disconnect then reconnect and reverify the data', function (callback) {
 
 		var _this = this;
 
-		initService(tmpFile, '3_stopping_starting', _this.test.Context, function(e){
+		initService(tmpFile, '5_eventemitter_stoppingstarting', _this.test.Context, function (e) {
 
 			if (e) return callback(e);
 
-			getClient(currentService, _this.test.Context, function(e, testclient){
+			getClient(currentService, _this.test.Context, function (e, testclient) {
 
 				if (e) return callback(e);
 
-				testclient.get(persistKey, null, function(e, response){
+				testclient.get(persistKey, null, function (e, response) {
 
 					if (e) return callback(e);
 
@@ -109,19 +123,19 @@ test.initialize('03-stopping-starting', function() {
 		});
 	});
 
-	it('should create a memory server - check for the data - shouldnt be any', function(callback) {
+	it('should create a memory server - check for the data - shouldnt be any', function (callback) {
 
 		var _this = this;
 
-		initService(null, '3_stopping_starting', _this.test.Context, function(e){
+		initService(null, '5_eventemitter_stoppingstarting', _this.test.Context, function (e) {
 
 			if (e) return callback(e);
 
-			getClient(currentService, _this.test.Context, function(e, testclient){
+			getClient(currentService, _this.test.Context, function (e, testclient) {
 
 				if (e) return callback(e);
 
-				testclient.get(persistKey, null, function(e, response){
+				testclient.get(persistKey, null, function (e, response) {
 
 					if (e) return callback(e);
 
@@ -134,35 +148,37 @@ test.initialize('03-stopping-starting', function() {
 
 	});
 
-	it('should stop then start and verify the server name', function(callback) {
+	it('should stop then start and verify the server name', function (callback) {
 
 		var _this = this;
-
-		initService(tmpFile, '3_stopping_starting', _this.test.Context, function(e){
+		
+		initService(tmpFile, '5_eventemitter_stoppingstarting', _this.test.Context, function (e) {
 
 			if (e) return callback(e);
 
 			var currentPersistedServiceName = currentService.services.system.name;
-			expect(currentPersistedServiceName).to.be('3_stopping_starting');
+			expect(currentPersistedServiceName).to.be('5_eventemitter_stoppingstarting');
 
-			initService(null, null, _this.test.Context, function(e){
+			initService(null, null, _this.test.Context, function (e) {
 
 				var currentUnpersistedServiceName = currentService.services.system.name;
-				expect(currentUnpersistedServiceName).to.not.be('3_stopping_starting');
+				expect(currentUnpersistedServiceName).to.not.be('5_eventemitter_stoppingstarting');
 				expect(currentUnpersistedServiceName).to.not.be(null);
 				expect(currentUnpersistedServiceName).to.not.be(undefined);
 
-				initService(tmpFile, null, _this.test.Context, function(e){
+				initService(tmpFile, null, _this.test.Context, function (e) {
 					if (e) return callback(e);
 
 					var currentPersistedRestartedServiceName = currentService.services.system.name;
-					expect(currentPersistedRestartedServiceName).to.be('3_stopping_starting');
+					expect(currentPersistedRestartedServiceName).to.be('5_eventemitter_stoppingstarting');
 					callback();
 
 				});
 
 			});
+
 		});
+
 	});
 
 });
