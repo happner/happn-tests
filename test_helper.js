@@ -137,16 +137,20 @@ TestHelper.prototype.stopHappnServices = function(callback){
 
   async.each(this.happnServices,
     function(currentService, eachServiceCB){
-      currentService.stop(eachServiceCB);
+      currentService.stop({reconnect:false}, eachServiceCB);
     },
-    callback);
+    function(e){
+
+      if (!e)
+        this.happnServices = [];//reset the services
+
+      callback(e);
+    });
 }
 
 TestHelper.prototype.disconnectHappnClients = function(callback){
 
   if (this.happnClients.length == 0) return callback();
-
-  console.log('disconnecting clients:::', this.happnClients.length);
 
   async.each(this.happnClients,
     function(currentClient, eachClientCB){

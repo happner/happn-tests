@@ -7,21 +7,24 @@ test.initialize('04-listeners', function() {
 
   var happnInstance = null;
 
-  after(function (done) {
-    happnInstance.stop(done);
+  after(function(done) {
+    this.test.Context.helper.tearDown(done);
   });
 
   before('should initialize the service', function (callback) {
 
-    happn = this.test.Context.happnDependancy;
+    var _this = this;
+
+    happn = _this.test.Context.happnDependancy;
     service = happn.service;
 
     try {
-      service.create(JSON.parse(JSON.stringify(testContext.serviceConfig)),
+      service.create(JSON.parse(JSON.stringify(_this.test.Context.serviceConfig)),
         function (e, happnInst) {
           if (e)
             return callback(e);
 
+          _this.test.Context.helper.addHappnService(happnInst);
           happnInstance = happnInst;
           callback();
         });
@@ -40,19 +43,22 @@ test.initialize('04-listeners', function() {
    database whilst another listens for changes.
    */
   before('should initialize the clients', function (callback) {
-    
+
+    var _this = this;
+
     try {
 
-      testContext.publisherClient(happnInstance, function (e, instance) {
+      _this.test.Context.publisherClient(happnInstance, function (e, instance) {
 
         if (e) return callback(e);
 
         publisherclient = instance;
-
-        testContext.listenerClient(happnInstance, function (e, instance) {
+        _this.test.Context.helper.addHappnClient(publisherclient);
+        _this.test.Context.listenerClient(happnInstance, function (e, instance) {
 
           if (e) return callback(e);
           listenerclient = instance;
+          _this.test.Context.helper.addHappnClient(listenerclient);
           callback();
 
         });
