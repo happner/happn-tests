@@ -51,6 +51,11 @@ TestHelper.prototype.connectHappnClient = function(service, opts, callback) {
 
   var _this = this;
 
+  if (typeof opts == 'function'){
+    callback = opts;
+    opts = {};
+  }
+
   var clientConfig =  {
     plugin: happn.client_plugins.intra_process,
     context: service
@@ -72,7 +77,7 @@ TestHelper.prototype.connectHappnClient = function(service, opts, callback) {
 
   }
 
-  if (opts.secure){
+  if (opts.secure || (service && service.config.secure)){
 
     clientConfig.secure = true;
 
@@ -81,8 +86,17 @@ TestHelper.prototype.connectHappnClient = function(service, opts, callback) {
     clientConfig.config.username = '_ADMIN';
     clientConfig.config.password = 'happn';
 
-    if (opts.adminPassword)
+    if (service &&
+      service.config.services &&
+      service.config.services.security &&
+      service.config.services.security.config &&
+      service.config.services.security.config.adminUser)
+
+      opts.adminPassword = service.config.services.security.config.adminUser.password;
+
+    if (opts.adminPassword)//override
       clientConfig.config.password = opts.adminPassword;
+
 
   }
 
@@ -133,16 +147,6 @@ TestHelper.prototype.startHappnServices = function(configs, opts, callback){
 
         if (opts && opts.websocketsClient && config.port)
           opts.port = config.port;
-
-        if (config.secure){
-          opts.secure = true;
-          if (config.services &&
-            config.services.security &&
-            config.services.security.config &&
-            config.services.security.config.adminUser)
-
-            opts.adminPassword = config.services.security.config.adminUser.password;
-        }
 
         _this.connectHappnClient(instance, opts, function(e, clientInstance){
 

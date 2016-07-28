@@ -3,12 +3,16 @@ var happn_client = happn.client;
 
 module.exports = {
 	happnDependancy:require('happn'),
-	serviceConfig:{},
+	serviceConfig:{
+		secure:true,
+		encryptPayloads:true
+	},
 	startServiceOptions:{},
 	listenerClientConfig:function(happnInstance){
 		return {
 			plugin: happn.client_plugins.intra_process,
-			context: happnInstance
+			context: happnInstance,
+			secure:true
 		}
 	}
 }

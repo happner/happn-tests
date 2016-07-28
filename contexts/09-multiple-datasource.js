@@ -18,6 +18,7 @@ module.exports = {
   },
   serviceConfig2:function(tempFile, test_id){
       return {
+        port:55002,
         services: {
           data: {
             path: './services/data_embedded/service.js',
@@ -27,8 +28,8 @@ module.exports = {
                   name:'memory',
                   isDefault:true,
                   patterns:[
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/*',
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard'
+                    '/09-multiple-datasource/' + test_id + '/memorytest/*',
+                    '/09-multiple-datasource/' + test_id + '/memorynonwildcard'
                   ]
                 },
                 {
@@ -37,8 +38,8 @@ module.exports = {
                     filename:tempFile
                   },
                   patterns:[
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/*',
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard'
+                    '/09-multiple-datasource/' + test_id + '/persistedtest/*',
+                    '/09-multiple-datasource/' + test_id + '/persistednonwildcard'
                   ]
                 }
               ]
@@ -52,7 +53,7 @@ module.exports = {
     var config =  {
   		plugin: happn.client_plugins.intra_process,
   		context: happnInstance
-  	}
+  	};
 
   	happn_client.create(config, callback);
 

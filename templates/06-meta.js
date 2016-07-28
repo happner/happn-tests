@@ -74,8 +74,6 @@ test.initialize('06-meta', function() {
 
             function (e, instance) {
 
-              console.log('created listener client:::', e);
-
               if (e) return callback(e);
 
               listenerclient = instance;

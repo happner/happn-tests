@@ -1,24 +1,14 @@
-
 var test = new Test();
 
-test.initialize('a1-multiple-datasource', function(){
+test.initialize('09-multiple-datasource', function () {
 
-  var expect = require('expect.js');
-  var async = require('async');
-  var fs = require('fs');
-  var happn = require('../lib/index');
-  var HAPPNER_STOP_DELAY = 5000;
+  var fs;
 
-  var testport = 8000;
-  var test_secret = 'test_secret';
-  var mode = "embedded";
-  var default_timeout = 10000;
-  var happnInstance = null;
-  var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
-  var tempFile1 = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
-  var test_id = Date.now() + '_' + require('shortid').generate();
+  var tempFile;
+  var tempFile1;
 
-  var persistKey = '/persistence_test/' + require('shortid').generate();
+  var test_id;
+
   var services = [];
 
   var singleClient;
@@ -27,99 +17,30 @@ test.initialize('a1-multiple-datasource', function(){
   //console.log('persisted data file', tempFile1);
 
   var getService = function (config, callback) {
+    var happn = require('happn');
     happn.service.create(config,
       callback
     );
-  }
-
-  var getClient = function (service, callback) {
-    happn.client.create({
-      plugin: happn.client_plugins.intra_process,
-      context: service
-    }, function (e, instance) {
-
-      if (e) return callback(e);
-
-      callback(null, instance);
-
-    });
-  }
+  };
 
   before('should initialize the services', function (callback) {
 
+    var _this = this;
+
     this.timeout(60000);//travis sometiems takes ages...
 
+    fs = require('fs');
+
+    tempFile = this.test.Context.helper.randomFile('db');
+    tempFile1 = this.test.Context.helper.randomFile('db');
+
+    test_id = this.test.Context.helper.testId();
+
+    services = [];
+
     var serviceConfigs = [
-      {
-        port: 55001,
-        services: {
-          auth: {
-            path: './services/auth/service.js',
-            config: {
-              authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-              systemSecret: test_secret
-            }
-          },
-          data: {
-            path: './services/data_embedded/service.js',
-            config: {
-              filename: tempFile
-            }
-          },
-          pubsub: {
-            path: './services/pubsub/service.js',
-            config: {}
-          }
-        },
-        utils: {
-          log_level: 'info|error|warning',
-          log_component: 'prepare'
-        }
-      },
-      {
-        services: {
-          auth: {
-            path: './services/auth/service.js',
-            config: {
-              authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-              systemSecret: test_secret
-            }
-          },
-          data: {
-            path: './services/data_embedded/service.js',
-            config: {
-              datastores: [
-                {
-                  name: 'memory',
-                  isDefault: true,
-                  patterns: [
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/*',
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard'
-                  ]
-                },
-                {
-                  name: 'persisted',
-                  settings: {
-                    filename: tempFile1
-                  },
-                  patterns: [
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/*',
-                    '/a3_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard'
-                  ]
-                }
-              ]
-            }
-          },
-          pubsub: {
-            path: './services/pubsub/service.js',
-            config: {}
-          }
-        },
-        utils: {
-          log_level: 'info|error|warning',
-          log_component: 'prepare'
-        }
-      }
+      this.test.Context.serviceConfig1(tempFile),
+      this.test.Context.serviceConfig2(tempFile1, test_id)
     ];
 
     async.eachSeries(serviceConfigs,
@@ -127,6 +48,8 @@ test.initialize('a1-multiple-datasource', function(){
         getService(serviceConfig, function (e, happnService) {
 
           if (e) return serviceConfigCallback(e);
+
+          _this.test.Context.helper.addHappnService(happnService);
 
           services.push(happnService);
           serviceConfigCallback();
@@ -137,48 +60,28 @@ test.initialize('a1-multiple-datasource', function(){
 
         if (e) return callback(e);
 
-        getClient(services[0], function (e, client) {
-
-          if (e) return callback(e);
-
-          singleClient = client;
-
-          getClient(services[1], function (e, client) {
+          _this.test.Context.client(services[0], function (e, client) {
 
             if (e) return callback(e);
+            _this.test.Context.helper.addHappnClient(client);
+            singleClient = client;
 
-            multipleClient = client;
+            _this.test.Context.client(services[1], function (e, client) {
 
-            callback();
+              if (e) return callback(e);
+              _this.test.Context.helper.addHappnClient(client);
+              multipleClient = client;
+              callback();
 
-          });
-
+            });
         });
-
-
       });
 
   });
 
   after('should delete the temp data files', function (callback) {
-
-    fs.unlink(tempFile, function (e) {
-      if (e) return callback(e);
-      fs.unlink(tempFile1, function (e) {
-        if (e) return callback(e);
-
-        async.each(services,
-          function (currentService, eachServiceCB) {
-            currentService.stop(eachServiceCB);
-          },
-          callback);
-
-      });
-
-    });
-
+   this.test.Context.helper.tearDown(callback);
   });
-
 
   it('should push some data into the single datastore service', function (callback) {
 
@@ -186,7 +89,7 @@ test.initialize('a1-multiple-datasource', function(){
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/set/' + test_path_end;
+      var test_path = '/09-multiple-datasource/' + test_id + '/set/' + test_path_end;
 
       singleClient.set(test_path, {
         property1: 'property1',
@@ -216,7 +119,7 @@ test.initialize('a1-multiple-datasource', function(){
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/set/' + test_path_end;
+      var test_path = '/09-multiple-datasource/' + test_id + '/set/' + test_path_end;
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -285,7 +188,7 @@ test.initialize('a1-multiple-datasource', function(){
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/' + test_path_end;
+      var test_path = '/09-multiple-datasource/' + test_id + '/memorytest/' + test_path_end;
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -327,7 +230,7 @@ test.initialize('a1-multiple-datasource', function(){
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/' + test_path_end;
+      var test_path = '/09-multiple-datasource/' + test_id + '/persistedtest/' + test_path_end;
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -370,7 +273,7 @@ test.initialize('a1-multiple-datasource', function(){
     this.timeout(4000);
 
     try {
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard';
+      var test_path = '/09-multiple-datasource/' + test_id + '/memorynonwildcard';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -411,7 +314,7 @@ test.initialize('a1-multiple-datasource', function(){
     this.timeout(4000);
 
     try {
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard';
+      var test_path = '/09-multiple-datasource/' + test_id + '/persistednonwildcard';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -454,7 +357,7 @@ test.initialize('a1-multiple-datasource', function(){
     this.timeout(4000);
 
     try {
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/default';
+      var test_path = '/09-multiple-datasource/' + test_id + '/default';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -496,7 +399,7 @@ test.initialize('a1-multiple-datasource', function(){
 
     var randomTag = require('shortid').generate();
 
-    var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/tag'
+    var test_path = '/09-multiple-datasource/' + test_id + '/persistedtest/tag'
 
     multipleClient.set(test_path, {
       property1: 'property1',
@@ -559,8 +462,8 @@ test.initialize('a1-multiple-datasource', function(){
     this.timeout(10000);
     var caughtCount = 0;
 
-    var memoryTestPath = '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/event';
-    var persistedTestPath = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/event';
+    var memoryTestPath = '/09-multiple-datasource/' + test_id + '/memorytest/event';
+    var persistedTestPath = '/09-multiple-datasource/' + test_id + '/persistedtest/event';
 
     multipleClient.onAll(function (eventData, meta) {
 
@@ -616,7 +519,7 @@ test.initialize('a1-multiple-datasource', function(){
     this.timeout(4000);
 
     try {
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      var test_path = '/09-multiple-datasource/' + test_id + '/persistedaddedpattern';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -657,7 +560,7 @@ test.initialize('a1-multiple-datasource', function(){
     this.timeout(4000);
 
     try {
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      var test_path = '/09-multiple-datasource/' + test_id + '/persistedaddedpattern';
 
       services[1].services.data.addDataStoreFilter(test_path, 'persisted');
 
@@ -703,7 +606,7 @@ test.initialize('a1-multiple-datasource', function(){
 
     try {
 
-      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      var test_path = '/09-multiple-datasource/' + test_id + '/persistedaddedpattern';
       var patternExists = false;
 
       for (var pattern in services[1].services.data.dataroutes) {
@@ -735,5 +638,6 @@ test.initialize('a1-multiple-datasource', function(){
     }
 
   });
+
 
 });

@@ -14,12 +14,12 @@ test.initialize('07-datatypes', function() {
 
   var publisherclient;
   var listenerclient;
-
+  var happn_client;
 
   before('should initialize the service and the publisher client', function (callback) {
 
     test_id = this.test.Context.helper.testId();
-
+    happn_client = this.test.Context.happnDependancy.client;
     try {
 
       this.test.Context.helper.startHappnServices([this.test.Context.serviceConfig], this.test.Context.startServiceOptions, function(e, services, clients){
@@ -43,11 +43,15 @@ test.initialize('07-datatypes', function() {
    */
   before('should initialize the listener client', function (callback) {
 
+    var _this = this;
+
     try {
 
-      happn_client.create(this.test.Context.listenerClientConfig, function (e, instance) {
+      _this.test.Context.helper.connectHappnClient(happnInstance, function (e, instance) {
 
         if (e) return callback(e);
+
+        _this.test.Context.helper.addHappnClient(instance);
 
         listenerclient = instance;
         callback();

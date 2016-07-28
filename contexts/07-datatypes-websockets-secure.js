@@ -6,10 +6,6 @@ module.exports = {
   },
   startServiceOptions:{},
   listenerClientConfig:function(happnInstance){
-    return {
-      secure:true,
-      plugin: happn.client_plugins.intra_process,
-      context: happnInstance
-    }
+    return {};
   }
 }
