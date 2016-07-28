@@ -2,7 +2,6 @@ var test = new Test();
 
 test.initialize('05-websockets-ports', function() {
 
-  var happn;
   var service1;
   var service2;
   var serviceDefault;
@@ -43,7 +42,7 @@ test.initialize('05-websockets-ports', function() {
     var config = JSON.parse(JSON.stringify(serviceConfig));
     config.port = port;
 
-    instance.initialize(config,
+    instance.create(config,
       function (e, instance) {
 
         if (e) return callback(e);
@@ -88,19 +87,19 @@ test.initialize('05-websockets-ports', function() {
         if (e) return callback(e);
 
         service1Client = instance;
-        _this.test.Context.addHappnClient(service1Port);
+        _this.test.Context.helper.addHappnClient(service1Client);
         happn_client.create(_this.test.Context.getClientConfig(service2Port), function (e, instance) {
 
           if (e) return callback(e);
 
           service2Client = instance;
-          _this.test.Context.addHappnClient(service2Port);
+          _this.test.Context.helper.addHappnClient(service2Client);
           happn_client.create(_this.test.Context.getClientConfig(55000), function (e, instance) {
 
             if (e) return callback(e);
 
             defaultClient = instance;
-            _this.test.Context.addHappnClient(defaultClient);
+            _this.test.Context.helper.addHappnClient(defaultClient);
             callback();
 
           });

@@ -1,6 +1,6 @@
 var test = new Test();
 
-test.initialize('01-vanilla', function() {
+test.initialize('02-browser-client', function() {
 
 	var expect = require('expect.js');
 	var happnInstance = null;

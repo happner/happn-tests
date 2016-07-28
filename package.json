@@ -3,7 +3,7 @@
   "description": "test templates for happn",
   "version": "0.1.0",
   "scripts": {
-    "test": "node test/happn_test",
+    "test": "node --expose-gc run --silent",
     "test-cover": "istanbul cover _mocha -- silence.js test"
   },
   "repository": {
@@ -14,6 +14,7 @@
     "async": "^1.5.2",
     "benchmarket": "*",
     "byline": "^4.2.1",
+    "commander": "^2.9.0",
     "fs-extra": "^0.26.5",
     "request": "^2.69.0"
   },

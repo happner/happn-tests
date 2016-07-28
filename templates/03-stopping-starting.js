@@ -62,17 +62,12 @@ test.initialize('03-stopping-starting', function() {
 
 	before('should initialize the service', function(callback) {
 
-
 		tmpFile = this.test.Context.helper.randomFile('nedb');
-
-		console.log('have random file:::', tmpFile);
 
 		persistKey = '/persistence_test/' +  this.test.Context.helper.shortid();
 		currentService = null;
 
 		happn = this.test.Context.happnDependancy;
-
-		console.log('about to initService:::', tmpFile);
 
 		initService(tmpFile, '3_stopping_starting', this.test.Context, callback);
 

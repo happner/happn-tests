@@ -45,7 +45,6 @@ Test.prototype.initialize = function(testName, testFunction){
         Context.helper = new TestHelper(testName);
 
         Contexts[testName] = Context;
-        console.log('pushed context:::', testName);
         describe(testName, testFunction);
 
       }

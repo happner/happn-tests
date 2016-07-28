@@ -6,8 +6,6 @@ GLOBAL.Contexts = [];
 GLOBAL.expect = require('expect.js');
 GLOBAL.async = require('async');
 
-var config = require('./config');
-
 module.exports = HappnTests;
 module.exports.instantiate = function(opts){
 	return new HappnTests(opts);
@@ -15,22 +13,10 @@ module.exports.instantiate = function(opts){
 
 function HappnTests(opts) {
 
-	if (typeof opts == 'string') opts = {
-		contextPath:opts
-	}
-
-	if (!opts) opts = {};
-
-	if (!opts.contextPath){
-		var path = require('path');
-		opts.contextPath = __dirname + '/contexts';
-	}
-
-	if (!opts.templatePath)
-		opts.templatePath = __dirname + '/templates';
-
-	if (!opts.config)
-		opts.config = __dirname + '/config.js';
+	if (!opts) throw new Error('config must be passed into HappnTests constructor');
+	if (!opts.contextPath) throw new Error('config must have a contextPath');
+	if (!opts.templatePath) throw new Error('config must have a templatePath');
+	if (!opts.timeoutt) opts.timeout = 60000; //default is 1 minute per test
 
 	this.opts = opts;
 }
@@ -105,16 +91,17 @@ HappnTests.prototype.run = function(callback){
 			.on('hook', function(test) {
 				test.Context =  Contexts[test.parent.title];
 				if (test.title.indexOf('"after all"') == 0){
-					require('benchmarket').storeCall(test.parent, config, function(e){
+					require('benchmarket').storeCall(test.parent, _this.opts, function(e){
 						console.log('benchmarket stored: ' + test.parent.title);
 					});
 				}
 			})
 			.on('test', function(test) {
+
 				test.Context =  Contexts[test.parent.title];
 				test.file = test.parent.file;
-				if (config.timeout)
-					test.timeout(config.timeout);
+				test.timeout(_this.opts.timeout);
+
 				benchMarket.beforeCall(test);
 			})
 			.on('test end', function(test) {

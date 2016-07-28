@@ -44,9 +44,69 @@ TestHelper.prototype.deleteTestDirectory = function(){
   if (tempDirectory){
     fs.emptyDirSync(tempDirectory);
     fs.rmdirSync(tempDirectory);
-    console.log('deleted temp dir:::', tempDirectory);
   }
 };
+
+TestHelper.prototype.connectHappnClient = function(service, opts, callback) {
+
+  var _this = this;
+
+  var clientConfig =  {
+    plugin: happn.client_plugins.intra_process,
+    context: service
+  };
+
+  if (opts && opts.websocketsClient){
+
+    clientConfig = {
+      config:{
+        port:55000
+      }
+    };
+
+    if (service)
+      clientConfig.config.port = service.config.port;
+
+    if (opts.port)//override
+      clientConfig.config.port = opts.port;
+
+  }
+
+  if (opts.secure){
+
+    clientConfig.secure = true;
+
+    if (!clientConfig.config) clientConfig.config = {};
+
+    clientConfig.config.username = '_ADMIN';
+    clientConfig.config.password = 'happn';
+
+    if (opts.adminPassword)
+      clientConfig.config.password = opts.adminPassword;
+
+  }
+
+  happn_client.create(clientConfig, function(e, clientInstance){
+    if (e) return callback(e);
+    _this.addHappnClient(clientInstance);
+    callback(null, clientInstance);
+  });
+  
+}
+
+TestHelper.prototype.startHappnService = function(config, callback){
+  var _this = this;
+
+  happn.service.create(config,
+    function(e, instance){
+
+      if (e) return callback(e);
+
+      _this.addHappnService(instance);
+      callback(null, instance);
+    }
+  );
+}
 
 TestHelper.prototype.startHappnServices = function(configs, opts, callback){
 
@@ -62,63 +122,45 @@ TestHelper.prototype.startHappnServices = function(configs, opts, callback){
 
   async.eachSeries(configs, function(config, configCB){
 
-    happn.service.create(config,
+    var decoupledConfig = JSON.parse(JSON.stringify(config));
+
+    _this.startHappnService(decoupledConfig,
       function(e, instance){
 
         if (e) return configCB(e);
+
         services.push(instance);
 
-        var clientConfig =  {
-          plugin: happn.client_plugins.intra_process,
-          context: instance
-        }
-
-        if (opts && opts.websocketsClient){
-          clientConfig = {
-            config:{
-              port:55000
-            }
-          };
-
-          if (config.port)
-            clientConfig.config.port = config.port;
-        }
+        if (opts && opts.websocketsClient && config.port)
+          opts.port = config.port;
 
         if (config.secure){
+          opts.secure = true;
+          if (config.services &&
+            config.services.security &&
+            config.services.security.config &&
+            config.services.security.config.adminUser)
 
-          clientConfig.secure = true;
-          clientConfig.config = {
-            username:'_ADMIN',
-            password:'happn'
-          }
-
-          if (config.services && config.services.security && config.services.security.adminPassword)
-            clientConfig.config.password = config.services.security.adminPassword;
+            opts.adminPassword = config.services.security.config.adminUser.password;
         }
 
-        happn_client.create(clientConfig, function(e, clientInstance){
+        _this.connectHappnClient(instance, opts, function(e, clientInstance){
 
           if (e) return configCB(e);
+
           clients.push(clientInstance);
 
           configCB();
         });
+
       }
     );
 
   }, function(e){
 
     if (e) return callback(e);
-
-    services.map(function(service){
-      _this.addHappnService(service);
-    });
-
-    clients.map(function(client){
-      _this.addHappnClient(client);
-    });
-
     callback(null, services, clients);
+
   });
 
 }
