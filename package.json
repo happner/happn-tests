@@ -1,7 +1,7 @@
 {
   "name": "happn-tests",
   "description": "test templates for happn",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main":"./tests.js",
   "scripts": {
     "test": "node --expose-gc run --silent",
@@ -17,21 +17,19 @@
     "byline": "^4.2.1",
     "commander": "^2.9.0",
     "fs-extra": "^0.26.5",
+    "happn-random-activity-generator": "*",
+    "happn": "*",
     "happn-logger": "0.0.2",
     "happn-util-crypto": "0.1.1",
     "request": "^2.69.0",
-    "bitcore-lib":"0.13.17"
-  },
-  "devDependencies": {
+    "bitcore-lib":"0.13.17",
     "chai": "^3.2.0",
     "coveralls": "^2.11.6",
     "expect.js": "*",
     "gulp": "^3.9.0",
     "istanbul": "^0.4.1",
     "mocha": "*",
-    "shortid": "^2.2.4",
-    "happn": "*",
-    "happn-random-activity-generator": "*"
+    "shortid": "^2.2.4"
   },
   "author": "",
   "license": "MIT",
