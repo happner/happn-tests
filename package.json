@@ -1,7 +1,7 @@
 {
   "name": "happn-tests",
   "description": "test templates for happn",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main":"./tests.js",
   "scripts": {
     "test": "node --expose-gc run --silent",
