@@ -149,10 +149,8 @@ test.initialize('01-vanilla', function(){
 
 	it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
-
 		var timesCount = 10;
-
-		var testBasePath = '/01-vanilla-test/' + test_id + '/set_multiple'
+		var testBasePath = '/01-vanilla-test/' + test_id + '/set_multiple' + '/' + require('shortid').generate();
 
 		try {
 
@@ -433,7 +431,8 @@ test.initialize('01-vanilla', function(){
 				}, {noPublish: true}, function (e, updateResult) {
 
 					expect(e).to.be(null);
-					expect(updateResult._meta.id == insertResult._meta.id).to.be(true);
+					expect(updateResult._meta._id.toString() == insertResult._meta._id.toString()).to.be(true);
+
 					callback();
 
 				});
@@ -616,7 +615,7 @@ test.initialize('01-vanilla', function(){
 				}, null, function (e, updateResult) {
 
 					expect(e == null).to.be(true);
-					expect(updateResult._meta._id == insertResult._meta._id).to.be(true);
+					expect(updateResult._meta._id.toString() == insertResult._meta._id.toString()).to.be(true);
 					callback();
 
 				});

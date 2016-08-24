@@ -4,7 +4,7 @@ var shortid = require('shortid')
   , async = require('async')
   , happn = require('happn')
   , happn_client = happn.client
-;
+  ;
 
 function TestHelper(testName){
   this.testName = testName;
@@ -97,7 +97,6 @@ TestHelper.prototype.connectHappnClient = function(service, opts, callback) {
     if (opts.adminPassword)//override
       clientConfig.config.password = opts.adminPassword;
 
-
   }
 
   happn_client.create(clientConfig, function(e, clientInstance){
@@ -105,7 +104,7 @@ TestHelper.prototype.connectHappnClient = function(service, opts, callback) {
     _this.addHappnClient(clientInstance);
     callback(null, clientInstance);
   });
-  
+
 }
 
 TestHelper.prototype.startHappnService = function(config, callback){
@@ -122,6 +121,15 @@ TestHelper.prototype.startHappnService = function(config, callback){
   );
 }
 
+TestHelper.prototype.tryDecouple = function(config){
+  try{
+    var decoupled =  JSON.parse(JSON.stringify(config));
+    return decoupled;
+  }catch(e){
+    return config;
+  }
+}
+
 TestHelper.prototype.startHappnServices = function(configs, opts, callback){
 
   var _this = this;
@@ -136,7 +144,7 @@ TestHelper.prototype.startHappnServices = function(configs, opts, callback){
 
   async.eachSeries(configs, function(config, configCB){
 
-    var decoupledConfig = JSON.parse(JSON.stringify(config));
+    var decoupledConfig = _this.tryDecouple(config);
 
     _this.startHappnService(decoupledConfig,
       function(e, instance){
@@ -145,8 +153,7 @@ TestHelper.prototype.startHappnServices = function(configs, opts, callback){
 
         services.push(instance);
 
-        if (opts && opts.websocketsClient && config.port)
-          opts.port = config.port;
+        if (opts && opts.websocketsClient && config.port) opts.port = config.port;
 
         _this.connectHappnClient(instance, opts, function(e, clientInstance){
 

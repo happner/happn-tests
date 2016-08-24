@@ -7,6 +7,9 @@ GLOBAL.expect = require('expect.js');
 GLOBAL.async = require('async');
 
 module.exports = HappnTests;
+
+var path = require('path');
+
 module.exports.instantiate = function(opts){
 	return new HappnTests(opts);
 }
@@ -15,8 +18,10 @@ function HappnTests(opts) {
 
 	if (!opts) throw new Error('config must be passed into HappnTests constructor');
 	if (!opts.contextPath) throw new Error('config must have a contextPath');
-	if (!opts.templatePath) throw new Error('config must have a templatePath');
-	if (!opts.timeoutt) opts.timeout = 60000; //default is 1 minute per test
+
+	if (!opts.templatePath) opts.templatePath = __dirname + path.sep + 'templates';
+
+	if (!opts.timeout) opts.timeout = 60000; //default is 1 minute per test
 
 	this.opts = opts;
 }
@@ -86,12 +91,12 @@ HappnTests.prototype.run = function(callback){
 
 			.on('suite', function(suite) {
 				suite.Context = Contexts[suite.title];
-				require('benchmarket').start();
+				if (!_this.opts.noBenchmarket) require('benchmarket').start();
 			})
 			.on('hook', function(test) {
 				test.Context =  Contexts[test.parent.title];
 				if (test.title.indexOf('"after all"') == 0){
-					require('benchmarket').storeCall(test.parent, _this.opts, function(e){
+					if (!_this.opts.noBenchmarket) require('benchmarket').storeCall(test.parent, _this.opts, function(e){
 						console.log('benchmarket stored: ' + test.parent.title);
 					});
 				}
@@ -102,22 +107,22 @@ HappnTests.prototype.run = function(callback){
 				test.file = test.parent.file;
 				test.timeout(_this.opts.timeout);
 
-				benchMarket.beforeCall(test);
+				if (!_this.opts.noBenchmarket) benchMarket.beforeCall(test);
 			})
 			.on('test end', function(test) {
 				test.Context =  Contexts[test.parent.title];
 			})
 			.on('suite end', function(suite) {
 				suite.Context = Contexts[suite.title];
-				require('benchmarket').stop();
+				if (!_this.opts.noBenchmarket) require('benchmarket').stop();
 			})
 			.on('pass', function(test) {
 				test.file = test.parent.file;
-				benchMarket.afterCall(null, test);
+				if (!_this.opts.noBenchmarket) benchMarket.afterCall(null, test);
 			})
 			.on('fail', function(test, err) {
 				test.file = test.parent.file;
-				benchMarket.afterCall(err, test);
+				if (!_this.opts.noBenchmarket) benchMarket.afterCall(err, test);
 			})
 			.on('end', function(failures) {
 				if (failures) return callback(new Error('tests ran with failures:' + failures));
