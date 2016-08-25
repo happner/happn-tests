@@ -40,7 +40,7 @@ describe('test_helper', function () {
 			if (e) return done(e);
 
 			_this.helper.connectHappnClient(service, {websocketsClient:true, port:55001}, function(e){
-				expect(e.toString()).to.be('Error: connect ECONNREFUSED');
+				expect(e.toString().substring(0, 27)).to.be('Error: connect ECONNREFUSED');
 				//correct port override
 				_this.helper.connectHappnClient(service, {websocketsClient:true, port:55004}, function(e){
 					expect(e).to.be(null);
